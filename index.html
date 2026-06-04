@@ -103,7 +103,7 @@
         .info-input:focus { outline: none; border-color: #e024ce; background: #ffffff; box-shadow: 0 0 15px rgba(224, 36, 206, 0.3); }
 
         h2 { color: #334155; font-size: 1.3rem; margin-top: 40px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; }
-        .question-group { margin-bottom: 20px; padding: 20px; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: transform 0.2s; scroll-margin-top: 40px; }
+        .question-group { margin-bottom: 20px; padding: 20px; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: transform 0.2s; }
         .question-group:hover { border-color: #cbd5e1; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .question-title { font-weight: 800; margin-bottom: 15px; color: #475569; }
         
@@ -196,8 +196,8 @@
             <p>Phần 3 (Trả lời ngắn): <span id="score-p3" style="color: #0f172a; font-weight: bold;"></span> / 3.0 điểm</p>
             <hr style="border: 0; height: 1px; background: #e2e8f0; margin: 20px 0;">
             <p><strong>TỔNG ĐIỂM: <span id="total-score" class="score-highlight"></span> <span style="font-size:20px; color:#64748b">/ 10.0</span></strong></p>
-            <p style="color: #64748b; font-style: italic; margin-top: 15px; font-size: 0.95rem;">(Cuộn lên trên để xem lại: Đáp án <span style="color:#00c853; font-weight:bold;">Xanh</span> là đúng, <span style="color:#d50000; font-weight:bold; text-decoration:line-through;">Đỏ</span> là sai).</p>
-            <button class="exit-btn" onclick="var w=window.open('https://anhkhoatqt11.github.io/demnguockithi/','_blank'); if(w && w.document && w.document.documentElement && w.document.documentElement.requestFullscreen){w.document.documentElement.requestFullscreen();}">Xác nhận thoát bài thi</button>
+            <p style="color: #64748b; font-style: italic; margin-top: 15px; font-size: 0.95rem;">(Cuộn lên trên để xem lại: Đáp án <span style="color:#00c853; font-weight:bold;">Xanh</span> là đúng, <span style="color:#d50000; font-weight:bold;">Đỏ</span> là sai)</p>
+            <button class="exit-btn" onclick="window.location.href='https://anhkhoatqt11.github.io/demnguockithi/'">THOÁT & QUAY LẠI TRANG CHỦ</button>
         </div>
     </div>
 
@@ -236,10 +236,10 @@
     // ==========================================
     const ANSWER_KEYS = {
         // --- Các mã đề cũ (bạn đã có) ---
-        "1201": { part1: ["A","B","B","B","A","A","A","A","A","C","A","C"], part2: [{a:"S", b:"S", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"S", d:"Đ"}, {a:"S", b:"Đ", c:"S", d:"Đ"}], part3: ["0,03", "1", "92", "21", "209", "0,8"] },
+        "1201": { part1: ["A","B","B","B","A","A","A","A","A","C","A","C"], part2: [{a:"S", b:"S", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"S", d:"Đ"}, {a:"S", b:"Đ", c:"Đ", d:"Đ"}], part3: ["0,03", "0,06", "0,03", "0,09", "6", "8"] },
         
         // --- CÁC MÃ ĐỀ BỔ SUNG TỪ ẢNH ---
-        "0124": { part1: ["D","B","D","D","A","B","C","A","A","B","C","A"], part2: [{a:"Đ", b:"Đ", c:"S", d:"S"}, {a:"S", b:"Đ", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"S", d:"Đ"}, {a:"S", b:"S", c:"Đ", d:"Đ"}], part3: ["135", "664", "0,55", "25", "6", "100"] }
+        "0124": { part1: ["D","B","D","D","A","B","C","A","A","B","C","A"], part2: [{a:"Đ", b:"Đ", c:"S", d:"S"}, {a:"S", b:"Đ", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"S", d:"Đ"}, {a:"S", b:"S", c:"Đ", d:"Đ"}], part3: ["0,03", "0,06", "0,03", "0,09", "6", "8"] },
     };
 
     // ==========================================
