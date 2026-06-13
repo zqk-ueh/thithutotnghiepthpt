@@ -93,7 +93,7 @@
             text-shadow: 0 0 20px rgba(0, 198, 255, 0.3); letter-spacing: 1px;
             display: none; 
         }
-        .info-group { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; flex-wrap: wrap; }
+        .info-group { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
         .info-input { 
             padding: 14px 20px; font-size: 16px; font-family: inherit; width: 100%; max-width: 280px; 
             background: #ffffff; border: 2px solid #e2e8f0; border-radius: 12px; 
@@ -101,6 +101,78 @@
         }
         .info-input::placeholder { color: #94a3b8; font-weight: 400; }
         .info-input:focus { outline: none; border-color: #e024ce; background: #ffffff; box-shadow: 0 0 15px rgba(224, 36, 206, 0.3); }
+        .info-input:disabled { background: #f1f5f9; color: #64748b; cursor: not-allowed; }
+
+        /* Exam info display */
+        .exam-info-section {
+            background: rgba(0, 198, 255, 0.1);
+            border: 2px solid #00d4ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .exam-info-display {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .exam-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .exam-info-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .exam-info-value {
+            font-size: 1.1rem;
+            color: #0072ff;
+            font-weight: 800;
+        }
+
+        .exam-link-btn {
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #00d4ff, #0072ff);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .exam-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 198, 255, 0.4);
+        }
+
+        .exam-link-btn:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         h2 { color: #334155; font-size: 1.3rem; margin-top: 40px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; }
         .question-group { margin-bottom: 20px; padding: 20px; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: transform 0.2s; }
@@ -170,6 +242,8 @@
         @media (max-width: 900px) {
             .layout-wrapper { flex-direction: column-reverse; }
             .sidebar { width: 100%; position: static; }
+            .exam-info-section { flex-direction: column; }
+            .exam-info-display { width: 100%; }
         }
     </style>
 </head>
@@ -183,7 +257,23 @@
         
         <div class="info-group">
             <input type="text" id="student-name" class="info-input" placeholder="Nhập họ và tên...">
-            <input type="text" id="exam-code" class="info-input" placeholder="Nhập mã đề (VD: 1201)">
+        </div>
+
+        <!-- Exam Info Section -->
+        <div class="exam-info-section">
+            <div class="exam-info-display">
+                <div class="exam-info-item">
+                    <span class="exam-info-label">Mã Đề</span>
+                    <span class="exam-info-value" id="display-exam-code">-</span>
+                </div>
+                <div class="exam-info-item">
+                    <span class="exam-info-label">Tên Đề</span>
+                    <span class="exam-info-value" id="display-exam-name">-</span>
+                </div>
+            </div>
+            <a href="#" id="exam-pdf-link" class="exam-link-btn" target="_blank" style="display: none;">
+                📄 Xem Đề
+            </a>
         </div>
         
         <div id="exam-form"></div>
@@ -197,7 +287,7 @@
             <hr style="border: 0; height: 1px; background: #e2e8f0; margin: 20px 0;">
             <p><strong>TỔNG ĐIỂM: <span id="total-score" class="score-highlight"></span> <span style="font-size:20px; color:#64748b">/ 10.0</span></strong></p>
             <p style="color: #64748b; font-style: italic; margin-top: 15px; font-size: 0.95rem;">(Cuộn lên trên để xem lại: Đáp án <span style="color:#00c853; font-weight:bold;">Xanh</span> là đúng, <span style="color:#d50000; font-weight:bold;">Đỏ</span> là sai)</p>
-            <button class="exit-btn" onclick="window.location.href='https://anhkhoatqt11.github.io/demnguockithi/'">THOÁT & QUAY LẠI TRANG CHỦ</button>
+            <button class="exit-btn" onclick="window.location.href='select-exam.html'">QUAY LẠI CHỌN ĐỀ</button>
         </div>
     </div>
 
@@ -232,14 +322,50 @@
 
 <script>
     // ==========================================
+    // 0. LOAD DỮ LIỆU TỪ SESSION
+    // ==========================================
+    const EXAM_DATA = {
+        "1201": { name: "Đề thi tốt nghiệp THPT năm 2025", pdfLink: "https://example.com/de-1201.pdf" },
+        "0124": { name: "Đề cụm THPT TP. Hải Phòng", pdfLink: "https://example.com/de-0124.pdf" },
+        "0101": { name: "Đề Sở Lào Cai", pdfLink: "https://example.com/de-0101.pdf" },
+        "1001": { name: "Đề Sở TP. Huế", pdfLink: "https://example.com/de-1001.pdf" },
+        "0112": { name: "Đề Sở Phú Thọ", pdfLink: "https://example.com/de-0112.pdf" },
+        "0102": { name: "Đề thi mẫu ĐGNLCB HCMUE môn Toán 2025", pdfLink: "https://example.com/de-0102.pdf" },
+        "1101": { name: "Đề Sở Thanh Hoá (lần 1)", pdfLink: "https://example.com/de-1101.pdf" },
+        "1307": { name: "Đề Sở Hà Nội", pdfLink: "https://example.com/de-1307.pdf" },
+        "2025": { name: "Đề năm 2025", pdfLink: "https://example.com/de-2025.pdf" },
+        "0107": { name: "Đề Sở Hải Phòng", pdfLink: "https://example.com/de-0107.pdf" },
+        "0120": { name: "Đề Sở Sơn La (lần 2)", pdfLink: "https://example.com/de-0120.pdf" },
+        "1102": { name: "Đề Sở Thanh Hóa (lần 2)", pdfLink: "https://example.com/de-1102.pdf" },
+    };
+
+    let selectedExamCode = sessionStorage.getItem("selectedExamCode") || "1201";
+
+    function loadExamInfo() {
+        const examData = EXAM_DATA[selectedExamCode] || { name: "Đề thi", pdfLink: "" };
+        document.getElementById("display-exam-code").innerText = selectedExamCode;
+        document.getElementById("display-exam-name").innerText = examData.name;
+        
+        const pdfLink = document.getElementById("exam-pdf-link");
+        if (examData.pdfLink && examData.pdfLink !== "") {
+            pdfLink.href = examData.pdfLink;
+            pdfLink.style.display = "inline-flex";
+        } else {
+            pdfLink.style.display = "none";
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", loadExamInfo);
+
+    // ==========================================
     // 1. DỮ LIỆU ĐÁP ÁN
     // ==========================================
     const ANSWER_KEYS = {
         // --- Các mã đề cũ (bạn đã có) ---
-        "1201": { part1: ["A","B","B","B","A","A","A","A","A","C","A","C"], part2: [{a:"S", b:"S", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"S", d:"Đ"}, {a:"S", b:"Đ", c:"Đ", d:"Đ"}], part3: ["0,03", "0,06", "0,03", "0,09", "6", "8"] },
+        "1201": { part1: ["A","B","B","B","A","A","A","A","A","C","A","C"], part2: [{a:"S", b:"S", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"S", d:"Đ"}, {a:"S", b:"Đ", c:"Đ", d:"Đ"}], part3: ["0,03","0,02","0,5","0,1","2","1,5"] },
         
         // --- CÁC MÃ ĐỀ BỔ SUNG TỪ ẢNH ---
-        "0124": { part1: ["D","B","D","D","A","B","C","A","A","B","C","A"], part2: [{a:"Đ", b:"Đ", c:"S", d:"S"}, {a:"S", b:"Đ", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"S", d:"Đ"}, {a:"S", b:"S", c:"Đ", d:"Đ"}], part3: ["0,03", "0,06", "0,03", "0,09", "6", "8"] },
+        "0124": { part1: ["D","B","D","D","A","B","C","A","A","B","C","A"], part2: [{a:"Đ", b:"Đ", c:"S", d:"S"}, {a:"S", b:"Đ", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"S", d:"Đ"}, {a:"S", b:"S", c:"Đ", d:"Đ"}], part3: ["0,04","0,03","0,6","0,2","3","2"] },
     };
 
     // ==========================================
@@ -352,11 +478,11 @@
     // ==========================================
     function calculateScore(isAutoSubmit = false) {
         let studentName = document.getElementById("student-name").value.trim();
-        let examCode = document.getElementById("exam-code").value.trim();
+        let examCode = selectedExamCode;
         if (studentName === "") studentName = "Ẩn danh";
         
         if (!ANSWER_KEYS[examCode]) {
-            if(!isAutoSubmit) alert("⚠️ Mã đề không hợp lệ! Vui lòng nhập đúng mã đề.");
+            if(!isAutoSubmit) alert("⚠️ Mã đề không hợp lệ! Vui lòng thử lại.");
             return; 
         }
 
