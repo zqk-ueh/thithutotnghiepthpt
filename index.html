@@ -322,33 +322,44 @@
 
 <script>
     // ==========================================
-    // 0. LOAD DỮ LIỆU TỪ SESSION
+    // 0. DANH SÁCH ĐỀ THI VỚI LINK GOOGLE DRIVE
     // ==========================================
     const EXAM_DATA = {
-        "1201": { name: "Đề thi tốt nghiệp THPT năm 2025", pdfLink: "https://example.com/de-1201.pdf" },
-        "0124": { name: "Đề cụm THPT TP. Hải Phòng", pdfLink: "https://example.com/de-0124.pdf" },
-        "0101": { name: "Đề Sở Lào Cai", pdfLink: "https://example.com/de-0101.pdf" },
-        "1001": { name: "Đề Sở TP. Huế", pdfLink: "https://example.com/de-1001.pdf" },
-        "0112": { name: "Đề Sở Phú Thọ", pdfLink: "https://example.com/de-0112.pdf" },
-        "0102": { name: "Đề thi mẫu ĐGNLCB HCMUE môn Toán 2025", pdfLink: "https://example.com/de-0102.pdf" },
-        "1101": { name: "Đề Sở Thanh Hoá (lần 1)", pdfLink: "https://example.com/de-1101.pdf" },
-        "1307": { name: "Đề Sở Hà Nội", pdfLink: "https://example.com/de-1307.pdf" },
-        "2025": { name: "Đề năm 2025", pdfLink: "https://example.com/de-2025.pdf" },
-        "0107": { name: "Đề Sở Hải Phòng", pdfLink: "https://example.com/de-0107.pdf" },
-        "0120": { name: "Đề Sở Sơn La (lần 2)", pdfLink: "https://example.com/de-0120.pdf" },
-        "1102": { name: "Đề Sở Thanh Hóa (lần 2)", pdfLink: "https://example.com/de-1102.pdf" },
+        // Format: "mã_đề": { name: "Tên đề", driveFileId: "ID_FILE_GOOGLE_DRIVE" }
+        // Để lấy file ID: Mở file trên Drive, URL sẽ là: https://drive.google.com/file/d/FILE_ID/view
+        // Copy FILE_ID vào đây
+        
+        "1201": { name: "Đề thi tốt nghiệp THPT năm 2025", driveFileId: "" },
+        "0124": { name: "Đề cụm THPT TP. Hải Phòng", driveFileId: "" },
+        "0101": { name: "Đề Sở Lào Cai", driveFileId: "" },
+        "1001": { name: "Đề Sở TP. Huế", driveFileId: "" },
+        "0112": { name: "Đề Sở Phú Thọ", driveFileId: "" },
+        "0102": { name: "Đề thi mẫu ĐGNLCB HCMUE môn Toán 2025", driveFileId: "" },
+        "1101": { name: "Đề Sở Thanh Hoá (lần 1)", driveFileId: "" },
+        "1307": { name: "Đề Sở Hà Nội", driveFileId: "" },
+        "2025": { name: "Đề năm 2025", driveFileId: "" },
+        "0107": { name: "Đề Sở Hải Phòng", driveFileId: "" },
+        "0120": { name: "Đề Sở Sơn La (lần 2)", driveFileId: "" },
+        "1102": { name: "Đề Sở Thanh Hóa (lần 2)", driveFileId: "" },
     };
 
     let selectedExamCode = sessionStorage.getItem("selectedExamCode") || "1201";
 
+    function getGoogleDriveLink(fileId) {
+        if (!fileId) return "";
+        return `https://drive.google.com/uc?export=download&id=${fileId}`;
+    }
+
     function loadExamInfo() {
-        const examData = EXAM_DATA[selectedExamCode] || { name: "Đề thi", pdfLink: "" };
+        const examData = EXAM_DATA[selectedExamCode] || { name: "Đề thi", driveFileId: "" };
         document.getElementById("display-exam-code").innerText = selectedExamCode;
         document.getElementById("display-exam-name").innerText = examData.name;
         
         const pdfLink = document.getElementById("exam-pdf-link");
-        if (examData.pdfLink && examData.pdfLink !== "") {
-            pdfLink.href = examData.pdfLink;
+        const downloadLink = getGoogleDriveLink(examData.driveFileId);
+        
+        if (downloadLink) {
+            pdfLink.href = downloadLink;
             pdfLink.style.display = "inline-flex";
         } else {
             pdfLink.style.display = "none";
@@ -361,10 +372,7 @@
     // 1. DỮ LIỆU ĐÁP ÁN
     // ==========================================
     const ANSWER_KEYS = {
-        // --- Các mã đề cũ (bạn đã có) ---
         "1201": { part1: ["A","B","B","B","A","A","A","A","A","C","A","C"], part2: [{a:"S", b:"S", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"S", d:"Đ"}, {a:"S", b:"Đ", c:"Đ", d:"Đ"}], part3: ["0,03","0,02","0,5","0,1","2","1,5"] },
-        
-        // --- CÁC MÃ ĐỀ BỔ SUNG TỪ ẢNH ---
         "0124": { part1: ["D","B","D","D","A","B","C","A","A","B","C","A"], part2: [{a:"Đ", b:"Đ", c:"S", d:"S"}, {a:"S", b:"Đ", c:"Đ", d:"Đ"}, {a:"Đ", b:"S", c:"S", d:"Đ"}, {a:"S", b:"S", c:"Đ", d:"Đ"}], part3: ["0,04","0,03","0,6","0,2","3","2"] },
     };
 
@@ -375,7 +383,6 @@
     let htmlContent = "";
     let navP1 = "", navP2 = "", navP3 = "";
 
-    // P1
     htmlContent += "<h2>Phần I: Trắc nghiệm nhiều lựa chọn</h2>";
     for (let i = 0; i < 12; i++) {
         htmlContent += `<div class="question-group" id="group_p1_q${i}">
@@ -390,7 +397,6 @@
         navP1 += `<button class="nav-btn" id="nav-btn-p1-${i}" onclick="scrollToQ('group_p1_q${i}')">${i+1}</button>`;
     }
 
-    // P2
     htmlContent += "<h2>Phần II: Trắc nghiệm Đúng/Sai</h2>";
     const subItems = ['a', 'b', 'c', 'd'];
     for (let i = 0; i < 4; i++) {
@@ -408,7 +414,6 @@
         navP2 += `<button class="nav-btn" id="nav-btn-p2-${i}" onclick="scrollToQ('group_p2_q${i}')">${i+1}</button>`;
     }
 
-    // P3
     htmlContent += "<h2>Phần III: Trắc nghiệm trả lời ngắn</h2>";
     for (let i = 0; i < 6; i++) {
         htmlContent += `<div class="question-group" id="group_p3_q${i}">
